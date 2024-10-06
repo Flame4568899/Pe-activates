@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .vote-form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin: 10px 0 5px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vote for Your Favorite Sport</h1>
+        <form id="vote-form" class="vote-form">
+            <label for="name">Enter your name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="sport">Choose a sport:</label>
+            <select id="sport" name="sport" required>
+                <option value="Basketball">Basketball</option>
+                <option value="Olympic Handball">Olympic Handball</option>
+                <option value="Soccer">Soccer</option>
+                <option value="Hockey">Hockey</option>
+            </select>
+
+            <button type="submit">Submit Vote</button>
+        </form>
+
+        <div id="results" class="results" style="display:none;">
+            <h2>Current Votes</h2>
+            <div id="vote-results"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('vote-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const sport = document.getElementById('sport').value;
+
+            const response = await fetch('/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, sport })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('results').style.display = 'block';
+                const resultsDiv = document.getElementById('vote-results');
+                resultsDiv.innerHTML = '';
+                data.forEach(vote => {
+                    const voteEntry = document.createElement('p');
+                    voteEntry.textContent = `${vote.name} voted for ${vote.sport}`;
+                    resultsDiv.appendChild(voteEntry);
+                });
+            } else {
+                alert('Vote submission failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
